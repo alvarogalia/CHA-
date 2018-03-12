@@ -14,6 +14,14 @@
 		B362E85B2048675800616FA2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B362E8592048675800616FA2 /* LaunchScreen.storyboard */; };
 		B362E8662048675800616FA2 /* ChauchasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B362E8652048675800616FA2 /* ChauchasTests.swift */; };
 		B362E8712048675800616FA2 /* ChauchasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B362E8702048675800616FA2 /* ChauchasUITests.swift */; };
+		B362E8802048679F00616FA2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B362E87F2048679F00616FA2 /* Security.framework */; };
+		B37CD9FC204BA90E00236227 /* OrdenesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CD9FB204BA90E00236227 /* OrdenesTableViewController.swift */; };
+		B37CD9FE204BA92300236227 /* OrdenesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CD9FD204BA92300236227 /* OrdenesTableViewCell.swift */; };
+		B37CDA00204BABB300236227 /* Orden.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CD9FF204BABB300236227 /* Orden.swift */; };
+		B37CDA02204BAC4300236227 /* funciones.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CDA01204BAC4300236227 /* funciones.swift */; };
+		B37CDA04204C3EC500236227 /* CrearOrdenLimitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CDA03204C3EC500236227 /* CrearOrdenLimitViewController.swift */; };
+		B37CDA06204C86C900236227 /* CuentasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CDA05204C86C900236227 /* CuentasViewController.swift */; };
+		B37CDA08204ED07F00236227 /* SaldoUIPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37CDA07204ED07F00236227 /* SaldoUIPickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +55,15 @@
 		B362E86C2048675800616FA2 /* ChauchasUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChauchasUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B362E8702048675800616FA2 /* ChauchasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChauchasUITests.swift; sourceTree = "<group>"; };
 		B362E8722048675800616FA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B362E87F2048679F00616FA2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		B362E8812048686900616FA2 /* Chauchas-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Chauchas-Bridging-Header.h"; sourceTree = "<group>"; };
+		B37CD9FB204BA90E00236227 /* OrdenesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdenesTableViewController.swift; sourceTree = "<group>"; };
+		B37CD9FD204BA92300236227 /* OrdenesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdenesTableViewCell.swift; sourceTree = "<group>"; };
+		B37CD9FF204BABB300236227 /* Orden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orden.swift; sourceTree = "<group>"; };
+		B37CDA01204BAC4300236227 /* funciones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = funciones.swift; sourceTree = "<group>"; };
+		B37CDA03204C3EC500236227 /* CrearOrdenLimitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrearOrdenLimitViewController.swift; sourceTree = "<group>"; };
+		B37CDA05204C86C900236227 /* CuentasViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuentasViewController.swift; sourceTree = "<group>"; };
+		B37CDA07204ED07F00236227 /* SaldoUIPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaldoUIPickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B362E8802048679F00616FA2 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +99,7 @@
 				B362E8642048675800616FA2 /* ChauchasTests */,
 				B362E86F2048675800616FA2 /* ChauchasUITests */,
 				B362E84E2048675800616FA2 /* Products */,
+				B362E87E2048679F00616FA2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,12 +116,17 @@
 		B362E84F2048675800616FA2 /* Chauchas */ = {
 			isa = PBXGroup;
 			children = (
-				B362E8502048675800616FA2 /* AppDelegate.swift */,
-				B362E8522048675800616FA2 /* ViewController.swift */,
-				B362E8542048675800616FA2 /* Main.storyboard */,
-				B362E8572048675800616FA2 /* Assets.xcassets */,
-				B362E8592048675800616FA2 /* LaunchScreen.storyboard */,
+				B362E8812048686900616FA2 /* Chauchas-Bridging-Header.h */,
 				B362E85C2048675800616FA2 /* Info.plist */,
+				B362E8572048675800616FA2 /* Assets.xcassets */,
+				B362E8542048675800616FA2 /* Main.storyboard */,
+				B362E8592048675800616FA2 /* LaunchScreen.storyboard */,
+				B362E8502048675800616FA2 /* AppDelegate.swift */,
+				B37CDA09204ED08700236227 /* Classes */,
+				B37CD9FA204BA89400236227 /* Cells */,
+				B37CD9F9204BA88B00236227 /* Controllers */,
+				B37CD9FF204BABB300236227 /* Orden.swift */,
+				B37CDA01204BAC4300236227 /* funciones.swift */,
 			);
 			path = Chauchas;
 			sourceTree = "<group>";
@@ -123,6 +147,41 @@
 				B362E8722048675800616FA2 /* Info.plist */,
 			);
 			path = ChauchasUITests;
+			sourceTree = "<group>";
+		};
+		B362E87E2048679F00616FA2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B362E87F2048679F00616FA2 /* Security.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B37CD9F9204BA88B00236227 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B362E8522048675800616FA2 /* ViewController.swift */,
+				B37CD9FB204BA90E00236227 /* OrdenesTableViewController.swift */,
+				B37CDA03204C3EC500236227 /* CrearOrdenLimitViewController.swift */,
+				B37CDA05204C86C900236227 /* CuentasViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		B37CD9FA204BA89400236227 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				B37CD9FD204BA92300236227 /* OrdenesTableViewCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		B37CDA09204ED08700236227 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				B37CDA07204ED07F00236227 /* SaldoUIPickerView.swift */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -193,6 +252,7 @@
 				TargetAttributes = {
 					B362E84C2048675800616FA2 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 					B362E8602048675800616FA2 = {
@@ -259,8 +319,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B37CDA06204C86C900236227 /* CuentasViewController.swift in Sources */,
+				B37CD9FE204BA92300236227 /* OrdenesTableViewCell.swift in Sources */,
 				B362E8532048675800616FA2 /* ViewController.swift in Sources */,
+				B37CDA08204ED07F00236227 /* SaldoUIPickerView.swift in Sources */,
+				B37CDA02204BAC4300236227 /* funciones.swift in Sources */,
+				B37CD9FC204BA90E00236227 /* OrdenesTableViewController.swift in Sources */,
+				B37CDA00204BABB300236227 /* Orden.swift in Sources */,
 				B362E8512048675800616FA2 /* AppDelegate.swift in Sources */,
+				B37CDA04204C3EC500236227 /* CrearOrdenLimitViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,12 +493,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PJAW6R6Y6U;
 				INFOPLIST_FILE = Chauchas/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.alvarogalia.Chauchas;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Chauchas/Chauchas-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -441,12 +511,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PJAW6R6Y6U;
 				INFOPLIST_FILE = Chauchas/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.alvarogalia.Chauchas;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Chauchas/Chauchas-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
