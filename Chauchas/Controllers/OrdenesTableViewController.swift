@@ -10,45 +10,67 @@ import UIKit
 
 class OrdenesTableViewController: UITableViewController {
 
+    @IBOutlet weak var lblTotalCompras: UILabel!
+    @IBOutlet weak var lblTotalVentas: UILabel!
+    @IBOutlet weak var viewTotales: UIView!
+    
     @IBOutlet weak var selectorEstadoOrdenes: UISegmentedControl!
     var arrayAbiertas = [Orden]()
     var arrayCerradas = [Orden]()
     var arrayCanceladas = [Orden]()
     var array = [Orden]()
     
-    let mercado = "CHACLP"
+    var mercado = ""
+    
+    var totalCompras = 0
+    var totalVentas = 0
+    
+    var mainCurrencyUnits = 0
+    var secondaryCurrencyUnits = 0
+    
+    var mainCurrencySymbol = ""
+    var secondaryCurrencySymbol = ""
     
     @IBAction func selectorEsadoOrdenes(_ sender: Any) {
         obtieneOrdenes()
     }
     
     var timer = Timer()
-    
+    var standard = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        if let market = standard.object(forKey: "mercado") as? String {
+            mercado = market
+        }
+        
+        self.mainCurrencySymbol = standard.string(forKey: "mainCurrencySymbol") ?? ""
+        self.mainCurrencyUnits = standard.integer(forKey: "mainCurrencyUnits")
+        self.secondaryCurrencyUnits = standard.integer(forKey: "mainCurrencyUnits")
+        self.secondaryCurrencySymbol = standard.string(forKey: "secondaryCurrencySymbol") ?? ""
+        
         obtieneOrdenes()
-        
-        
         
     }
     func obtieneOrdenes(){
+        self.array.removeAll()
+        self.tableView.reloadData()
         timer.invalidate()
         if(selectorEstadoOrdenes.selectedSegmentIndex == 0){
+            self.viewTotales.isHidden = false
             obtieneOrdenesAbiertas()
             timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(self.obtieneOrdenesAbiertas), userInfo: nil, repeats: true)
         }else if(selectorEstadoOrdenes.selectedSegmentIndex == 1){
+            self.viewTotales.isHidden = false
             obtieneOrdenesCerradas()
+            timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(self.obtieneOrdenesCerradas), userInfo: nil, repeats: true)
         }else if(selectorEstadoOrdenes.selectedSegmentIndex == 2){
+            self.viewTotales.isHidden = true
             obtieneOrdenesCanceladas()
+            timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(self.obtieneOrdenesCanceladas), userInfo: nil, repeats: true)
         }
         
     }
@@ -81,38 +103,41 @@ class OrdenesTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellOrden", for: indexPath) as! OrdenesTableViewCell
         
         if(array[indexPath.row].sell){
+            //cell.backgroundColor = UIColor(displayP3Red: 90/255.0, green: 97/255.0, blue: 55/255.0, alpha: 1.0)
+            
             cell.lblOperacion.text = "Venta"
             cell.lblTotal.textColor = UIColor.green
             cell.lblTotalEjecutado.textColor = UIColor.green
             
             if(array[indexPath.row].type == "market"){
                 cell.lblMonto.text = "market"
-                cell.lblCantidad.text = "\(Double(array[indexPath.row].amount)/100000000.0)"
-                cell.lblTotal.text = "\(Int(Double(array[indexPath.row].secondaryAmount) * Double(array[indexPath.row].limitPrice)))"
-                cell.lblTotalEjecutado.text = "\(Int(Double(array[indexPath.row].secondaryFilled)/100000000.0 * Double(array[indexPath.row].limitPrice)))"
+                cell.lblCantidad.text = "\(Double(array[indexPath.row].amount) / Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber))"
+                cell.lblTotal.text = "0"
+                cell.lblTotalEjecutado.text = "0"
             }
         }else{
+            //cell.backgroundColor = UIColor(displayP3Red: 87/255.0, green: 61/255.0, blue: 54/255.0, alpha: 1.0)
             cell.lblOperacion.text = "Compra"
             cell.lblTotal.textColor = UIColor.red
             cell.lblTotalEjecutado.textColor = UIColor.red
             if(array[indexPath.row].type == "market"){
                 cell.lblMonto.text = "market"
                 cell.lblCantidad.text = "\(array[indexPath.row].secondaryAmount)"
-                cell.lblFilled.text = "\(Double(array[indexPath.row].secondaryFilled)/100000000.0)"
+                cell.lblFilled.text = "\(Double(array[indexPath.row].secondaryFilled)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber))"
                 
-                cell.lblTotal.text = "\(Int(Double(array[indexPath.row].secondaryAmount) * Double(array[indexPath.row].limitPrice)))"
-                cell.lblTotalEjecutado.text = "\(Int(Double(array[indexPath.row].secondaryFilled)/100000000.0 * Double(array[indexPath.row].limitPrice)))"
+                cell.lblTotal.text = "\(Int(Double(array[indexPath.row].secondaryAmount)))"
+                cell.lblTotalEjecutado.text = "\(Int(Double(array[indexPath.row].secondaryFilled)))"
             }
         }
         if(array[indexPath.row].type == "limit"){
             cell.lblMonto.text = "\(array[indexPath.row].limitPrice)\(array[indexPath.row].mainCurrencyCode)"
-            cell.lblCantidad.text = "\(Double(array[indexPath.row].amount)/100000000.0)"
-            cell.lblTotal.text = "\(Int(Double(array[indexPath.row].amount)/100000000.0 * Double(array[indexPath.row].limitPrice)))"
-            cell.lblTotalEjecutado.text = "\(Int(Double(array[indexPath.row].filled)/100000000.0 * Double(array[indexPath.row].limitPrice)))"
+            cell.lblCantidad.text = "\(Double(array[indexPath.row].amount)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber))"
+            cell.lblTotal.text = "\(Int(Double(array[indexPath.row].amount)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber) * Double(array[indexPath.row].limitPrice)))"
+            cell.lblTotalEjecutado.text = "\(Int(Double(array[indexPath.row].filled)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber) * Double(array[indexPath.row].limitPrice)))"
             
         }
         
-        cell.lblFilled.text = "\(Double(array[indexPath.row].filled)/100000000.0)"
+        cell.lblFilled.text = "\(Double(array[indexPath.row].filled)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber))"
         
         
         return cell
@@ -170,7 +195,7 @@ class OrdenesTableViewController: UITableViewController {
     */
 
     @objc func obtieneOrdenesAbiertas(){
-        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyOpen: true, limit: 1000000, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
+        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyOpen: true, limit: 10000, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
         
         let request = getRequest(body: body)
         
@@ -182,6 +207,9 @@ class OrdenesTableViewController: UITableViewController {
                     if let orders = data["orders"] as? [String : Any]{
                         if let items = orders["items"] as? [[String: Any]]{
                             self.arrayAbiertas.removeAll()
+                            self.totalCompras = 0
+                            self.totalVentas = 0
+                            
                             for item in items{
                                 let orden = self.llenaOrden(withItem: item)
                                 self.arrayAbiertas.append(orden)
@@ -192,6 +220,9 @@ class OrdenesTableViewController: UITableViewController {
                     DispatchQueue.main.async {
                         self.array = self.arrayAbiertas
                         self.tableView.reloadData()
+                        
+                        self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
+                        self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
                     }
                 }
             }
@@ -199,10 +230,11 @@ class OrdenesTableViewController: UITableViewController {
         
         task.resume()
     }
-    func obtieneOrdenesCerradas(){
-        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyClosed: true, limit: 1000000, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
+    @objc func obtieneOrdenesCerradas(){
+        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyClosed: true, limit: 10000, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
         
         let request = getRequest(body: body)
+        
         
         
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
@@ -212,6 +244,8 @@ class OrdenesTableViewController: UITableViewController {
                     if let orders = data["orders"] as? [String : Any]{
                         if let items = orders["items"] as? [[String: Any]]{
                             self.arrayCerradas.removeAll()
+                            self.totalCompras = 0
+                            self.totalVentas = 0
                             for item in items{
                                 let orden = self.llenaOrden(withItem: item)
                                 if(orden.status == "closed"){
@@ -225,16 +259,19 @@ class OrdenesTableViewController: UITableViewController {
             DispatchQueue.main.async {
                 self.array = self.arrayCerradas
                 self.tableView.reloadData()
+                self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
+                self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
             }
         }
         
         task.resume()
     }
     
-    func obtieneOrdenesCanceladas(){
-        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyClosed: true, limit: 1000000, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
+    @objc func obtieneOrdenesCanceladas(){
+        let body = ["query" : "query { orders(marketCode: \"\(mercado)\", onlyClosed: true, limit: 50, page: 1) { totalCount hasNextPage page items { _id sell type amount amountToHold secondaryAmount filled closedAt secondaryFilled limitPrice createdAt activatedAt isStop status stopPriceUp stopPriceDown market { name code mainCurrency { code format longFormat units __typename } secondaryCurrency { code format longFormat units __typename } __typename } __typename } __typename }}"]
         
         let request = getRequest(body: body)
+        
         
         
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
@@ -244,6 +281,8 @@ class OrdenesTableViewController: UITableViewController {
                         if let orders = data["orders"] as? [String : Any]{
                             if let items = orders["items"] as? [[String: Any]]{
                                 self.arrayCanceladas.removeAll()
+                                self.totalCompras = 0
+                                self.totalVentas = 0
                                 for item in items{
                                     let orden = self.llenaOrden(withItem: item)
                                     if(orden.status == "canceled"){
@@ -260,6 +299,9 @@ class OrdenesTableViewController: UITableViewController {
             DispatchQueue.main.async {
                 self.array = self.arrayCanceladas
                 self.tableView.reloadData()
+                
+                self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
+                self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
             }
         }
         
@@ -285,6 +327,15 @@ class OrdenesTableViewController: UITableViewController {
         orden.status = item["status"] as! String
         orden.stopPriceUp = item["stopPriceUp"] as? Int ?? 0
         orden.stopPriceDown = item["stopPriceDown"] as? Int ?? 0
+        
+        if(orden.type == "limit"){
+            if(orden.sell){
+                self.totalVentas = self.totalVentas + Int(Double(orden.amount)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber) * Double(orden.limitPrice))
+            }else{
+                self.totalCompras = self.totalCompras + Int(Double(orden.amount)/Double(truncating: pow(10, self.secondaryCurrencyUnits) as NSNumber) * Double(orden.limitPrice))
+            }
+            
+        }
         
         return orden
     }

@@ -129,6 +129,13 @@ extension Double {
     func toString(Decimales:Int) -> String {
         return String(format: "%.\(Decimales)f",self)
     }
+    func toStringTrail(Decimales:Int) -> String{
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 1
+        formatter.maximumFractionDigits = Decimales
+        formatter.minimumIntegerDigits = 1
+        return formatter.string(from: NSNumber(value: self)) ?? "0.0"
+    }
 }
 
 func getWiFiSsid() -> String? {
@@ -142,4 +149,34 @@ func getWiFiSsid() -> String? {
         }
     }
     return ssid
+}
+
+extension String {
+    var floatValue: Float {
+        let nf = NumberFormatter()
+        nf.decimalSeparator = "."
+        if let result = nf.number(from: self) {
+            return result.floatValue
+        } else {
+            nf.decimalSeparator = ","
+            if let result = nf.number(from: self) {
+                return result.floatValue
+            }
+        }
+        return 0
+    }
+    
+    var doubleValue:Double {
+        let nf = NumberFormatter()
+        nf.decimalSeparator = "."
+        if let result = nf.number(from: self) {
+            return result.doubleValue
+        } else {
+            nf.decimalSeparator = ","
+            if let result = nf.number(from: self) {
+                return result.doubleValue
+            }
+        }
+        return 0
+    }
 }

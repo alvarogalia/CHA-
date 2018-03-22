@@ -23,19 +23,18 @@ class SaldoUIPickerView: UIPickerView, UIPickerViewDataSource, UIPickerViewDeleg
     var isRojoVerde = false
     var isChaucha = false
     var cantDecimales = 0
-    var rowHeight = 30.0
+    var rowHeight = 11.0
     var valorAnterior = 0
+    var simbolo = ""
+    var units = 0
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return 1000
     }
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if(isChaucha){
-            return "CHA "
-        }else{
-            return "$\(row+multiplicador)"
-        }
-        
+        let valor = row+multiplicador
+        let valorFinal = Double(valor) / Double(truncating: pow(10, units) as NSNumber)
+        return "\(simbolo)\(valorFinal.toString(Decimales: units))"
     }
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -45,36 +44,38 @@ class SaldoUIPickerView: UIPickerView, UIPickerViewDataSource, UIPickerViewDeleg
         var pickerLabel: UILabel? = (view as? UILabel)
         if pickerLabel == nil {
             pickerLabel = UILabel()
-            pickerLabel?.font = UIFont(name: "Helvetica", size: 30.0)
+            let seleccionado = pickerView.selectedRow(inComponent: component)
+            if(row == seleccionado){
+                pickerLabel?.font = UIFont(name: "Helvetica", size: 21)
+            }else{
+                pickerLabel?.font = UIFont(name: "Helvetica", size: 17)
+            }
+            //
             
             pickerLabel?.textAlignment = .center
         }
-        var valor = ""
-        
-        if(isNegativo){
-            valor = "$-\(row+multiplicador)"
-        }else{
-            valor = "$\(row+multiplicador)"
-        }
+        let valor = row+multiplicador
+        let valorFinal = Double(valor) / Double(truncating: pow(10, units) as NSNumber)
+        let valorStr = "\(simbolo)\(valorFinal.toString(Decimales: units))"
         
         if(isRojoVerde){
             if(isNegativo){
-                pickerLabel?.text = valor
+                pickerLabel?.text = valorStr
                 pickerLabel?.textColor = UIColor.red
             }else{
-                pickerLabel?.text = valor
+                pickerLabel?.text = valorStr
                 pickerLabel?.textColor = UIColor.green
             }
         }else{
-            pickerLabel?.text = valor
+            pickerLabel?.text = valorStr
             pickerLabel?.textColor = UIColor.lightGray
         }
         
         return pickerLabel!
     }
     
-    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-        return CGFloat(self.rowHeight)
-    }
+//    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+//        return CGFloat(self.rowHeight)
+//    }
     
 }

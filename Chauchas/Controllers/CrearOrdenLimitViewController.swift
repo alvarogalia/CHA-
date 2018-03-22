@@ -10,11 +10,16 @@ import UIKit
 
 class CrearOrdenLimitViewController: UIViewController {
 
-    let mercado = "CHACLP"
+    var mercado = ""
     
     var cantChauchasCompradas = 0.0
     var saldoDisponible = 0
 
+    var mainCurrencyUnits = 0
+    var secondaryCurrencyUnits = 0
+    
+    var mainCurrencySymbol = ""
+    var secondaryCurrencySymbol = ""
     
     @IBOutlet weak var txtPrecioLimite: UITextField!
     @IBOutlet weak var txtMonto: UITextField!
@@ -29,13 +34,13 @@ class CrearOrdenLimitViewController: UIViewController {
         if(selectorCompraVenta.selectedSegmentIndex == 0){
             
             if(txtPrecioLimite.text != ""){
-                let precioLimite : Double = Double(txtPrecioLimite.text!)!
+                let precioLimite : Double = (txtPrecioLimite.text?.doubleValue)!
                 if(precioLimite > 0.0){
                     
                     let this = sender as! UISegmentedControl
                     var saldoAUsar = 0.0
                     if(this.selectedSegmentIndex == 4){
-                        saldoAUsar = Double(saldoDisponible) * 1
+                        saldoAUsar = Double(saldoDisponible) * 1.0
                     }
                     if(this.selectedSegmentIndex == 3){
                         saldoAUsar = Double(saldoDisponible) * 0.5
@@ -55,8 +60,8 @@ class CrearOrdenLimitViewController: UIViewController {
                     
                     txtMonto.text = "\(montoFinal)"
                     
-                    lblMontoAGastar.text = "$\(Int(montoFinal * precioLimite))"
-                    lblMontoRecibir.text = "CHA \(montoFinal)"
+                    lblMontoAGastar.text = "\(self.secondaryCurrencySymbol)\(Int(montoFinal * precioLimite))"
+                    lblMontoRecibir.text = "\(self.mainCurrencySymbol)\(montoFinal)"
                     
                 }else{
                     txtMonto.text = "0"
@@ -72,13 +77,13 @@ class CrearOrdenLimitViewController: UIViewController {
             
         }else{
             if(txtPrecioLimite.text != ""){
-                let precioLimite : Double = Double(txtPrecioLimite.text!)!
+                let precioLimite : Double = (txtPrecioLimite.text?.doubleValue)!
                 if(precioLimite > 0.0){
                     
                     let this = sender as! UISegmentedControl
                     var saldoAUsar = 0.0
                     if(this.selectedSegmentIndex == 4){
-                        saldoAUsar = Double(cantChauchasCompradas) * 1
+                        saldoAUsar = Double(cantChauchasCompradas) * 1.0
                     }
                     if(this.selectedSegmentIndex == 3){
                         saldoAUsar = Double(cantChauchasCompradas) * 0.5
@@ -96,8 +101,8 @@ class CrearOrdenLimitViewController: UIViewController {
                     
                     txtMonto.text = "\(saldoAUsar)"
                     
-                    lblMontoAGastar.text = "CHA \(saldoAUsar)"
-                    lblMontoRecibir.text = "$ \(montoInt)"
+                    lblMontoAGastar.text = "\(self.mainCurrencySymbol)\(saldoAUsar)"
+                    lblMontoRecibir.text = "\(self.secondaryCurrencySymbol)\(montoInt)"
                     
                 }else{
                     txtMonto.text = "0"
@@ -136,24 +141,46 @@ class CrearOrdenLimitViewController: UIViewController {
         }
         if(lblMontoRecibir.text != "0" && lblMontoAGastar.text != "0"){
             if(selectorCompraVenta.selectedSegmentIndex == 0){
-                compraChauchas(monto: Double(txtMonto.text!)!, valorChaucha: Int(txtPrecioLimite.text!)!)
-                txtMonto.text = "0"
-                lblMontoAGastar.text = "0"
-                lblMontoRecibir.text = "0"
+                let alert = UIAlertController(title: "Confirmación", message: "Estás seguro de comprar \(self.mainCurrencySymbol)\((txtMonto.text?.doubleValue)!) a \(self.secondaryCurrencySymbol)\(txtPrecioLimite.text!)?", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "Confirmar", style: UIAlertActionStyle.default, handler: { action in
+                    
+                    self.compraChauchas(monto: (self.txtMonto.text?.doubleValue)!, valorChaucha: Int(self.txtPrecioLimite.text!)!)
+                    self.txtMonto.text = "0"
+                    self.lblMontoAGastar.text = "0"
+                    self.lblMontoRecibir.text = "0"
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }else{
-                vendeChauchas(monto: Double(txtMonto.text!)!, valorChaucha: Int(txtPrecioLimite.text!)!)
-                txtMonto.text = "0"
-                lblMontoAGastar.text = "0"
-                lblMontoRecibir.text = "0"
+                let alert = UIAlertController(title: "Confirmación", message: "Estás seguro de comprar \(self.mainCurrencySymbol)\((txtMonto.text?.doubleValue)!) a \(self.secondaryCurrencySymbol)\(txtPrecioLimite.text!)?", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "Confirmar", style: UIAlertActionStyle.default, handler: { action in
+                    
+                    self.vendeChauchas(monto: (self.txtMonto.text?.doubleValue)!, valorChaucha: Int(self.txtPrecioLimite.text!)!)
+                    self.txtMonto.text = "0"
+                    self.lblMontoAGastar.text = "0"
+                    self.lblMontoRecibir.text = "0"
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }
     
     var timer = Timer()
-    
+    var standard = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if let market = standard.object(forKey: "mercado") as? String {
+            mercado = market
+        }
+        
+        self.mainCurrencySymbol = standard.string(forKey: "mainCurrencySymbol") ?? ""
+        self.mainCurrencyUnits = standard.integer(forKey: "mainCurrencyUnits")
+        self.secondaryCurrencyUnits = standard.integer(forKey: "mainCurrencyUnits")
+        self.secondaryCurrencySymbol = standard.string(forKey: "secondaryCurrencySymbol") ?? ""
+        
+        
         hideKeyboardWhenTappedAround()
         obtieneCantidadChauchasCompradas()
     }
@@ -172,12 +199,12 @@ class CrearOrdenLimitViewController: UIViewController {
 
     @objc func obtieneCantidadChauchasCompradas(){
         
-        let limit : Double = Double(txtPrecioLimite.text!) ?? 0.0
-        let monto : Double = Double(txtMonto.text!) ?? 0.0
+        let limit : Double = (txtPrecioLimite.text?.doubleValue)!
+        let monto : Double = (txtMonto.text?.doubleValue)!
         
         if(selectorCompraVenta.selectedSegmentIndex == 0){
-            lblMontoAGastar.text = "$\(Int(limit * monto))"
-            lblMontoRecibir.text = "CHA \(txtMonto.text ?? "0")"
+            lblMontoAGastar.text = "\(self.secondaryCurrencySymbol)\(Int(limit * monto))"
+            lblMontoRecibir.text = "\(self.mainCurrencySymbol)\(txtMonto.text ?? "0")"
             if(Int(limit * monto) > self.saldoDisponible){
                 btnCrearOrden.isEnabled = false
             }else{
@@ -189,8 +216,8 @@ class CrearOrdenLimitViewController: UIViewController {
             }else{
                 btnCrearOrden.isEnabled = true
             }
-            lblMontoAGastar.text = "CHA \(txtMonto.text ?? "0")"
-            lblMontoRecibir.text = "$\(Int(limit * monto))"
+            lblMontoAGastar.text = "\(self.mainCurrencySymbol)\(txtMonto.text ?? "0")"
+            lblMontoRecibir.text = "\(self.secondaryCurrencySymbol)\(Int(limit * monto))"
         }
         
         let body = ["query": "{ market(code: \"\(mercado)\") { commission mainCurrency { ...getMarketCurrency } secondaryCurrency { ...getMarketCurrency } } me { _id marketFees(marketCode: \"\(mercado)\") { maker taker } }}fragment getMarketCurrency on Currency { wallet { availableBalance }}"]
@@ -207,18 +234,18 @@ class CrearOrdenLimitViewController: UIViewController {
                             
                             if let mainCurrency = market["mainCurrency"] as? [String: Any]{
                                 if let mainCurrencyWallet = mainCurrency["wallet"] as? [String: Any]{
-                                    mainCurrencyWalletAvailableBalance = mainCurrencyWallet["availableBalance"] as! Int
+                                    mainCurrencyWalletAvailableBalance = mainCurrencyWallet["availableBalance"] as? Int ?? 0
                                 }
                             }
                             
                             if let secondaryCurrency = market["secondaryCurrency"] as? [String: Any]{
                                 if let secondaryCurrencyWallet = secondaryCurrency["wallet"] as? [String: Any]{
-                                    secondaryCurrencyWalletWalletAvailableBalance = secondaryCurrencyWallet["availableBalance"] as! Int
+                                    secondaryCurrencyWalletWalletAvailableBalance = secondaryCurrencyWallet["availableBalance"] as? Int ?? 0
                                 }
                             }
                             DispatchQueue.main.async {
                                 self.saldoDisponible = secondaryCurrencyWalletWalletAvailableBalance
-                                self.cantChauchasCompradas = Double(mainCurrencyWalletAvailableBalance) / 100000000.0
+                                self.cantChauchasCompradas = Double(mainCurrencyWalletAvailableBalance) / Double(truncating: pow(10, self.mainCurrencyUnits) as NSNumber)
                             }
                         }
                     }
@@ -229,27 +256,71 @@ class CrearOrdenLimitViewController: UIViewController {
     }
     
     func compraChauchas(monto : Double, valorChaucha : Int){
-        let montoInt : Int = Int(monto * 100000000.0)
+        let montoInt : Int = Int(monto * Double(truncating: pow(10, self.mainCurrencyUnits) as NSNumber))
         let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: false){ _id __typename }}"]
         
         let request = getRequest(body: body)
         
+        var errorOrden = true
+        
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
-            DispatchQueue.main.async {
-                
+            if(datos != nil){
+                DispatchQueue.main.async {
+                    let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
+                    if let data = json!["data"] as? [String: Any]{
+                        if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
+                            if let _id = placeLimitOrder["_id"] as? String{
+                                errorOrden = false
+                                let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
+                                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                self.present(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
+                }
             }
             
+            
+            DispatchQueue.main.async {
+                if(errorOrden){
+                    let alert = UIAlertController(title: "Error", message: "Error en la creación de la orden, intente nuevamente", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
         }
         
         task.resume()
     }
     func vendeChauchas(monto : Double, valorChaucha : Int){
-        let montoInt : Int = Int(monto * 100000000.0)
+        let montoInt : Int = Int(monto * Double(truncating: pow(10, self.mainCurrencyUnits) as NSNumber))
         let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: true){ _id __typename }}"]
         
         let request = getRequest(body: body)
+        var errorOrden = true
+        
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
+            if(datos != nil){
+                DispatchQueue.main.async {
+                    let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
+                    if let data = json!["data"] as? [String: Any]{
+                        if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
+                            if let _id = placeLimitOrder["_id"] as? String{
+                                errorOrden = false
+                                let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
+                                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                self.present(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
+                }
+            }
             DispatchQueue.main.async {
+                if(errorOrden){
+                    let alert = UIAlertController(title: "Error", message: "Error en la creación de la orden, intente nuevamente", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }
             }
         }
         
