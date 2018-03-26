@@ -9,7 +9,7 @@
 import UIKit
 
 class CuentasViewController: UIViewController {
-
+    
     @IBOutlet weak var btnSalir: UIButton!
     @IBOutlet weak var btnDonar: UIButton!
     @IBOutlet weak var txtApiKey: UITextField!
@@ -64,7 +64,7 @@ class CuentasViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         var apiKey = ""
         var secret = ""
         
@@ -86,22 +86,22 @@ class CuentasViewController: UIViewController {
         hideKeyboardWhenTappedAround()
         // Do any additional setup after loading the view.
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
     @IBOutlet weak var btnValidarCuenta: UIButton!
     @IBAction func btnValidarCuenta(_ sender: Any) {
         if(self.btnValidarCuenta.title(for: .normal) == "Validar Cuenta" && txtApiKey.text != "" && txtSecretKey.text != ""){
@@ -119,21 +119,20 @@ class CuentasViewController: UIViewController {
         let request = getRequestInicial(ApiKey:txtApiKey.text!, SecretKey:txtSecretKey.text!, body: body)
         //let request = getRequest(body: body)
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
-            if(datos != nil){
-                
-                
-                var ok = false
-                var nombre = ""
-                let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
-                if let data = json!["data"] as? [String: Any]{
-                    if let me = data["me"] as? [String: Any]{
-                        if let name = me["name"] as? String{
-                            ok = true
-                            nombre = name
+            
+            DispatchQueue.main.async {
+                if(datos != nil){
+                    var ok = false
+                    var nombre = ""
+                    let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
+                    if let data = json!["data"] as? [String: Any]{
+                        if let me = data["me"] as? [String: Any]{
+                            if let name = me["name"] as? String{
+                                ok = true
+                                nombre = name
+                            }
                         }
                     }
-                }
-                DispatchQueue.main.async {
                     if(ok){
                         self.lblMensajeError.textColor = UIColor.green
                         self.lblMensajeError.text = "Bienvenid@ \(nombre)"
@@ -155,15 +154,13 @@ class CuentasViewController: UIViewController {
                         self.lblMensajeError.text = "Error en la validación de la ApiKey"
                     }
                     self.lblMensajeError.isHidden = false
-                }
-            }else{
-                self.lblMensajeError.textColor = UIColor.red
-                self.lblMensajeError.text = "Error en la validación de la ApiKey"
-                
-                DispatchQueue.main.async {
+                }else{
+                    self.lblMensajeError.textColor = UIColor.red
+                    self.lblMensajeError.text = "Error en la validación de la ApiKey"
                     self.lblMensajeError.isHidden = false
                 }
             }
+            
         }
         
         task.resume()

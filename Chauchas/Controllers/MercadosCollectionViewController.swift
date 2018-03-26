@@ -59,7 +59,7 @@ class MercadosCollectionViewController: UICollectionViewController {
                                     mercado.symbol = secondaryCurrency["symbol"] as? String ?? ""
                                     mercado.units = secondaryCurrency["units"] as? Int ?? 0
                                 }
-                                if(mercado.code == "CHACLP" || mercado.code == "LUKCLP"){
+                                if(mercado.code == "CHACLP" || mercado.code == "LUKCLP" || mercado.code == "XMRCLP"){
                                     self.mercados.append(mercado)
                                 }
                             }

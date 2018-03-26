@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		73A303B379229951504821BD /* Pods_Chauchas.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBED3494D308BB26F0CCD3D7 /* Pods_Chauchas.framework */; };
 		B3349A59205AF34900EDDDF6 /* MercadosCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3349A58205AF34900EDDDF6 /* MercadosCollectionViewController.swift */; };
 		B3349A5B205AF36900EDDDF6 /* MercadosCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3349A5A205AF36900EDDDF6 /* MercadosCollectionViewCell.swift */; };
 		B3349A5D205AF87200EDDDF6 /* Mercado.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3349A5C205AF87200EDDDF6 /* Mercado.swift */; };
@@ -51,6 +52,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		69D258C35D9986F096FA0D2C /* Pods-Chauchas.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chauchas.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Chauchas/Pods-Chauchas.debug.xcconfig"; sourceTree = "<group>"; };
+		76FF500970988E693F8B152F /* Pods-Chauchas.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chauchas.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chauchas/Pods-Chauchas.release.xcconfig"; sourceTree = "<group>"; };
 		B3349A58205AF34900EDDDF6 /* MercadosCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercadosCollectionViewController.swift; sourceTree = "<group>"; };
 		B3349A5A205AF36900EDDDF6 /* MercadosCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MercadosCollectionViewCell.swift; sourceTree = "<group>"; };
 		B3349A5C205AF87200EDDDF6 /* Mercado.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mercado.swift; sourceTree = "<group>"; };
@@ -82,6 +85,7 @@
 		B3DF1E332057089E0018B553 /* HistorialTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorialTableViewCell.swift; sourceTree = "<group>"; };
 		B3DF1E35205708A90018B553 /* OrderBookTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderBookTableViewCell.swift; sourceTree = "<group>"; };
 		B3DF1E37205718790018B553 /* OrderBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderBook.swift; sourceTree = "<group>"; };
+		DBED3494D308BB26F0CCD3D7 /* Pods_Chauchas.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chauchas.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +94,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B362E8802048679F00616FA2 /* Security.framework in Frameworks */,
+				73A303B379229951504821BD /* Pods_Chauchas.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +115,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		706D929E62E4ABF3AF01A24F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				69D258C35D9986F096FA0D2C /* Pods-Chauchas.debug.xcconfig */,
+				76FF500970988E693F8B152F /* Pods-Chauchas.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		B362E8442048675800616FA2 = {
 			isa = PBXGroup;
 			children = (
@@ -118,6 +132,7 @@
 				B362E86F2048675800616FA2 /* ChauchasUITests */,
 				B362E84E2048675800616FA2 /* Products */,
 				B362E87E2048679F00616FA2 /* Frameworks */,
+				706D929E62E4ABF3AF01A24F /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -170,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				B362E87F2048679F00616FA2 /* Security.framework */,
+				DBED3494D308BB26F0CCD3D7 /* Pods_Chauchas.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -218,9 +234,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B362E8752048675900616FA2 /* Build configuration list for PBXNativeTarget "Chauchas" */;
 			buildPhases = (
+				11B13FCC4F7693529105E82A /* [CP] Check Pods Manifest.lock */,
 				B362E8492048675800616FA2 /* Sources */,
 				B362E84A2048675800616FA2 /* Frameworks */,
 				B362E84B2048675800616FA2 /* Resources */,
+				9BADDD41021156248DCC04D1 /* [CP] Embed Pods Frameworks */,
+				8C34A7ABD0BA3FBB7DDABE75 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -340,6 +359,57 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		11B13FCC4F7693529105E82A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Chauchas-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8C34A7ABD0BA3FBB7DDABE75 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Chauchas/Pods-Chauchas-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9BADDD41021156248DCC04D1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Chauchas/Pods-Chauchas-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B362E8492048675800616FA2 /* Sources */ = {
@@ -527,6 +597,7 @@
 		};
 		B362E8762048675900616FA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69D258C35D9986F096FA0D2C /* Pods-Chauchas.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -545,6 +616,7 @@
 		};
 		B362E8772048675900616FA2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 76FF500970988E693F8B152F /* Pods-Chauchas.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
