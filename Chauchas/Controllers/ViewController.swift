@@ -8,8 +8,12 @@
 
 import UIKit
 import AVFoundation
+import GoogleMobileAds
+import Firebase
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, GADBannerViewDelegate{
+    
+    var bannerView: GADBannerView!
     
     @IBOutlet weak var chauchasContables: UILabel!
     @IBOutlet weak var chauchasDisponibles: UILabel!
@@ -23,6 +27,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var pickerGanancia: UIPickerView!
     @IBOutlet weak var pickerGananciaMaxima: UIPickerView!
     
+    @IBOutlet weak var viewBanner: UIView!
     @IBOutlet weak var pickerUltimaTransaccionValor: UIPickerView!
     
     
@@ -34,7 +39,6 @@ class ViewController: UIViewController {
         
         let alert = UIAlertController(title: "Confirmación", message: "Estás seguro de comprar \(mainCurrencySymbol)\(cantChauchasAComprar.toStringTrail(Decimales: self.mainCurrencyUnits)) a \(precio)?", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Confirmar", style: UIAlertActionStyle.default, handler: { action in
-            
             self.compraChauchas(monto: cantChauchasAComprar, valorChaucha: self.valorActualVenta)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
@@ -49,6 +53,7 @@ class ViewController: UIViewController {
         let alert = UIAlertController(title: "Confirmación", message: "Estás seguro de comprar \(mainCurrencySymbol)\(cantChauchasCompradas.toStringTrail(Decimales: self.mainCurrencyUnits)) a \(precio)?", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Confirmar", style: UIAlertActionStyle.default, handler: { action in
             self.vendeChauchas(monto: self.cantChauchasCompradas, valorChaucha: self.valorActualCompra)
+            
         }))
         alert.addAction(UIAlertAction(title: "Cancelar", style: UIAlertActionStyle.cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
@@ -161,6 +166,13 @@ class ViewController: UIViewController {
         if let market = standard.object(forKey: "mercado") as? String {
             mercado = market
         }
+        
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-6479995755181265/7268470104"
+        bannerView.rootViewController = self
+        viewBanner.addBannerViewToView(bannerView: bannerView)
+        bannerView.load(GADRequest())
     }
     
     override func didReceiveMemoryWarning() {
@@ -340,6 +352,9 @@ class ViewController: UIViewController {
                         if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
                             if let _id = placeLimitOrder["_id"] as? String{
                                 errorOrden = false
+                                
+                                Analytics.logEvent("compra", parameters: ["marketCode":self.mercado, "amount":monto, "limitPrice": valorChaucha])
+                                
                                 let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
                                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                                 self.present(alert, animated: true, completion: nil)
@@ -376,6 +391,7 @@ class ViewController: UIViewController {
                         if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
                             if let _id = placeLimitOrder["_id"] as? String{
                                 errorOrden = false
+                                Analytics.logEvent("venta", parameters: ["marketCode":self.mercado, "amount":monto, "limitPrice": valorChaucha])
                                 let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
                                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                                 self.present(alert, animated: true, completion: nil)
@@ -397,5 +413,24 @@ class ViewController: UIViewController {
         
         task.resume()
     }
+    
+    @IBOutlet weak var height: NSLayoutConstraint!
+    
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        self.bannerView.alpha = 0.0
+        self.height.constant = 50
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 1
+        })
+    }
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
+        self.height.constant = 0
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 0.0
+        })
+    }
+    
 }
 

@@ -7,15 +7,18 @@
 //
 
 import UIKit
+import GoogleMobileAds
+import Firebase
 
-class CuentasViewController: UIViewController {
+class CuentasViewController: UIViewController, GADBannerViewDelegate {
     
     @IBOutlet weak var btnSalir: UIButton!
     @IBOutlet weak var btnDonar: UIButton!
     @IBOutlet weak var txtApiKey: UITextField!
     @IBOutlet weak var txtSecretKey: UITextField!
     @IBOutlet weak var lblMensajeError: UILabel!
-    
+    @IBOutlet weak var viewBanner: UIView!
+    var bannerView: GADBannerView!
     
     @IBAction func btnSalir(_ sender: Any) {
         UIView.animate(withDuration: 2, animations: {
@@ -85,6 +88,14 @@ class CuentasViewController: UIViewController {
         }
         hideKeyboardWhenTappedAround()
         // Do any additional setup after loading the view.
+        
+        
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-6479995755181265/6235015065"
+        bannerView.rootViewController = self
+        viewBanner.addBannerViewToView(bannerView: bannerView)
+        bannerView.load(GADRequest())
     }
     
     override func didReceiveMemoryWarning() {
@@ -137,6 +148,8 @@ class CuentasViewController: UIViewController {
                         self.lblMensajeError.textColor = UIColor.green
                         self.lblMensajeError.text = "Bienvenid@ \(nombre)"
                         
+                        Analytics.logEvent(AnalyticsEventLogin, parameters: ["name": nombre])
+                        
                         self.btnSalir.isHidden = false
                         
                         self.standard.set(self.txtApiKey.text, forKey: "ApiKey")
@@ -165,4 +178,22 @@ class CuentasViewController: UIViewController {
         
         task.resume()
     }
+    
+    @IBOutlet weak var height: NSLayoutConstraint!
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        self.bannerView.alpha = 0.0
+        self.height.constant = 50
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 1
+        })
+    }
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
+        self.height.constant = 0
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 0.0
+        })
+    }
+    
 }

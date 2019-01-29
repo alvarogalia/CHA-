@@ -7,12 +7,10 @@
 //
 
 import UIKit
+import GoogleMobileAds
+import Firebase
 
-class OrdenesTableViewController: UITableViewController {
-
-    @IBOutlet weak var lblTotalCompras: UILabel!
-    @IBOutlet weak var lblTotalVentas: UILabel!
-    @IBOutlet weak var viewTotales: UIView!
+class OrdenesTableViewController: UITableViewController, GADBannerViewDelegate{
     
     @IBOutlet weak var selectorEstadoOrdenes: UISegmentedControl!
     var arrayAbiertas = [Orden]()
@@ -31,12 +29,16 @@ class OrdenesTableViewController: UITableViewController {
     var mainCurrencySymbol = ""
     var secondaryCurrencySymbol = ""
     
+    @IBOutlet weak var viewBanner: UIView!
     @IBAction func selectorEsadoOrdenes(_ sender: Any) {
         obtieneOrdenes()
     }
     
     var timer = Timer()
     var standard = UserDefaults.standard
+    
+    var bannerView: GADBannerView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -53,6 +55,13 @@ class OrdenesTableViewController: UITableViewController {
         self.secondaryCurrencySymbol = standard.string(forKey: "secondaryCurrencySymbol") ?? ""
         
         obtieneOrdenes()
+
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-6479995755181265/9248191210"
+        bannerView.rootViewController = self
+        viewBanner.addBannerViewToView(bannerView: bannerView)
+        bannerView.load(GADRequest())
         
     }
     func obtieneOrdenes(){
@@ -60,15 +69,12 @@ class OrdenesTableViewController: UITableViewController {
         self.tableView.reloadData()
         timer.invalidate()
         if(selectorEstadoOrdenes.selectedSegmentIndex == 0){
-            self.viewTotales.isHidden = false
             obtieneOrdenesAbiertas()
             timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(self.obtieneOrdenesAbiertas), userInfo: nil, repeats: true)
         }else if(selectorEstadoOrdenes.selectedSegmentIndex == 1){
-            self.viewTotales.isHidden = false
             obtieneOrdenesCerradas()
             timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(self.obtieneOrdenesCerradas), userInfo: nil, repeats: true)
         }else if(selectorEstadoOrdenes.selectedSegmentIndex == 2){
-            self.viewTotales.isHidden = true
             obtieneOrdenesCanceladas()
             timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(self.obtieneOrdenesCanceladas), userInfo: nil, repeats: true)
         }
@@ -163,6 +169,7 @@ class OrdenesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             cancelarOrden(withID: array[indexPath.row]._id)
+            Analytics.logEvent("cancelarOrden", parameters: ["marketCode":self.mercado, "amount":array[indexPath.row].amount, "limitPrice": array[indexPath.row].limitPrice])
             array.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
@@ -220,9 +227,6 @@ class OrdenesTableViewController: UITableViewController {
                     DispatchQueue.main.async {
                         self.array = self.arrayAbiertas
                         self.tableView.reloadData()
-                        
-                        self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
-                        self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
                     }
                 }
             }
@@ -259,8 +263,6 @@ class OrdenesTableViewController: UITableViewController {
             DispatchQueue.main.async {
                 self.array = self.arrayCerradas
                 self.tableView.reloadData()
-                self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
-                self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
             }
         }
         
@@ -299,9 +301,6 @@ class OrdenesTableViewController: UITableViewController {
             DispatchQueue.main.async {
                 self.array = self.arrayCanceladas
                 self.tableView.reloadData()
-                
-                self.lblTotalVentas.text = "\(self.secondaryCurrencySymbol)\(self.totalVentas)"
-                self.lblTotalCompras.text = "\(self.secondaryCurrencySymbol)\(self.totalCompras)"
             }
         }
         
@@ -344,9 +343,11 @@ class OrdenesTableViewController: UITableViewController {
         let request = getRequest(body: body)
         let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
             DispatchQueue.main.async {
+                
                 self.tableView.reloadData()
             }
         }
         task.resume()
     }
+    
 }

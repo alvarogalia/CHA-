@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 class OrderBookTableViewController: UITableViewController {
 
@@ -92,6 +93,21 @@ class OrderBookTableViewController: UITableViewController {
         return cell
     }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = self.items[indexPath.row]
+        _ = item.limitPrice
+        
+//        let alert = UIAlertController(title: "Crear orden limit", message: "\(limitPrice)", preferredStyle: UIAlertControllerStyle.alert)
+//        alert.addAction(UIAlertAction(title: "Comprar", style: UIAlertActionStyle.default, handler: { action in
+//
+//        }))
+//        alert.addAction(UIAlertAction(title: "Vender", style: UIAlertActionStyle.default, handler: { action in
+//
+//        }))
+//        alert.addAction(UIAlertAction(title: "Canelar", style: UIAlertActionStyle.cancel, handler: nil))
+//        self.present(alert, animated: true, completion: nil)
+        
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -137,4 +153,93 @@ class OrderBookTableViewController: UITableViewController {
     }
     */
 
+    func compraChauchas(monto : Double, valorChaucha : Int){
+        let standard = UserDefaults.standard
+        var mercado = ""
+        if let market = standard.object(forKey: "mercado") as? String {
+            mercado = market
+        }
+        
+        let montoInt : Int = Int(monto * Double(truncating : pow(10, self.mainCurrencyUnits) as NSNumber))
+        let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: false){ _id }}"]
+        
+        let request = getRequest(body: body)
+        
+        var errorOrden = true
+        
+        let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
+            if(datos != nil){
+                DispatchQueue.main.async {
+                    let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
+                    if let data = json!["data"] as? [String: Any]{
+                        if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
+                            if let _id = placeLimitOrder["_id"] as? String{
+                                errorOrden = false
+                                
+                                Analytics.logEvent("compra", parameters: ["marketCode":mercado, "amount":monto, "limitPrice": valorChaucha])
+                                
+                                let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
+                                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                self.present(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            DispatchQueue.main.async {
+                if(errorOrden){
+                    let alert = UIAlertController(title: "Error", message: "Error en la creación de la orden, intente nuevamente", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
+        
+        task.resume()
+    }
+    func vendeChauchas(monto : Double, valorChaucha : Int){
+        let standard = UserDefaults.standard
+        var mercado = ""
+        if let market = standard.object(forKey: "mercado") as? String {
+            mercado = market
+        }
+        
+        let montoInt : Int = Int(monto * Double(truncating : pow(10, self.mainCurrencyUnits) as NSNumber))
+        let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: true){ _id __typename }}"]
+        
+        let request = getRequest(body: body)
+        var errorOrden = true
+        
+        let task = URLSession.shared.dataTask(with: request) { (datos, response, error) in
+            if(datos != nil){
+                DispatchQueue.main.async {
+                    let json = try? JSONSerialization.jsonObject(with: datos!) as! [String: Any]
+                    if let data = json!["data"] as? [String: Any]{
+                        if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
+                            if let _id = placeLimitOrder["_id"] as? String{
+                                errorOrden = false
+                                Analytics.logEvent("venta", parameters: ["marketCode":mercado, "amount":monto, "limitPrice": valorChaucha])
+                                let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
+                                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                self.present(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            DispatchQueue.main.async {
+                if(errorOrden){
+                    let alert = UIAlertController(title: "Error", message: "Error en la creación de la orden, intente nuevamente", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
+        
+        task.resume()
+    }
 }

@@ -10,7 +10,15 @@ import Foundation
 import Security
 import UIKit
 import SystemConfiguration.CaptiveNetwork
+import GoogleMobileAds
 
+extension UIView {
+    func addBannerViewToView(bannerView: GADBannerView) {
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(bannerView)
+        self.addConstraints([NSLayoutConstraint(item: bannerView,attribute: .top,relatedBy: .equal,toItem: self,attribute: .top,multiplier: 1,constant: 0),NSLayoutConstraint(item: bannerView,attribute: .centerX,relatedBy: .equal,toItem: self,attribute: .centerX,multiplier: 1,constant: 0)])
+    }
+}
 extension UIViewController {
     func hideKeyboardWhenTappedAround() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
@@ -70,12 +78,8 @@ func getRequest(body:[String : String]) -> URLRequest{
     var apiKey = ""
     var secret = ""
     
-    if let ApiKeySession = standard.object(forKey: "ApiKey") as? String {
-        apiKey = ApiKeySession
-    }
-    if let SecretKeySession = standard.object(forKey: "SecretKey") as? String {
-        secret = SecretKeySession
-    }
+    if let ApiKeySession = standard.object(forKey: "ApiKey") as? String {apiKey = ApiKeySession}
+    if let SecretKeySession = standard.object(forKey: "SecretKey") as? String {secret = SecretKeySession}
     
     let requestURL = URL(string: "https://api2.orionx.io/graphql")
     var request = URLRequest(url: requestURL!)
@@ -84,15 +88,17 @@ func getRequest(body:[String : String]) -> URLRequest{
     let bodyStr = String(data: jsonData!, encoding: String.Encoding.utf8)
     let signature = hmac(hashName: "SHA512", message: "\(timestamp5)\(bodyStr ?? "")".data(using: String.Encoding.utf8)!, key: secret.data(using: String.Encoding.utf8)!)
     
-    let headers: [String:String] = ["Content-Type":"application/json","X-ORIONX-TIMESTAMP":"\(timestamp5)","X-ORIONX-APIKEY":apiKey,"X-ORIONX-SIGNATURE":(signature?.hexEncodedString())!,"Content-Length":"\(bodyStr!.count)"]
-    
-    
+    let headers: [String:String] = [
+            "Content-Type":"application/json",
+            "X-ORIONX-TIMESTAMP":"\(timestamp5)",
+            "X-ORIONX-APIKEY":apiKey,
+            "X-ORIONX-SIGNATURE":(signature?.hexEncodedString())!,
+            "Content-Length":"\(bodyStr!.count)"]
     request.allHTTPHeaderFields = headers
     request.httpMethod = "POST"
     request.httpBody = jsonData
     
     request.timeoutInterval = 60
-
     
     return request
 }

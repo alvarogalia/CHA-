@@ -7,10 +7,13 @@
 //
 
 import UIKit
+import GoogleMobileAds
+import Firebase
 
-class CrearOrdenLimitViewController: UIViewController {
+class CrearOrdenLimitViewController: UIViewController, GADBannerViewDelegate {
 
     var mercado = ""
+    var bannerView: GADBannerView!
     
     var cantChauchasCompradas = 0.0
     var saldoDisponible = 0
@@ -27,12 +30,12 @@ class CrearOrdenLimitViewController: UIViewController {
     @IBOutlet weak var lblMontoAGastar: UILabel!
     @IBOutlet weak var selectorCompraVenta: UISegmentedControl!
     
+    @IBOutlet weak var viewBanner: UIView!
     @IBOutlet weak var btnCrearOrden: UIButton!
     
     @IBAction func selectorPorcentaje(_ sender: Any) {
         obtieneCantidadChauchasCompradas()
         if(selectorCompraVenta.selectedSegmentIndex == 0){
-            
             if(txtPrecioLimite.text != ""){
                 let precioLimite : Double = (txtPrecioLimite.text?.doubleValue)!
                 if(precioLimite > 0.0){
@@ -183,6 +186,13 @@ class CrearOrdenLimitViewController: UIViewController {
         
         hideKeyboardWhenTappedAround()
         obtieneCantidadChauchasCompradas()
+        
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-6479995755181265/1420891830"
+        bannerView.rootViewController = self
+        viewBanner.addBannerViewToView(bannerView: bannerView)
+        bannerView.load(GADRequest())
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -256,8 +266,8 @@ class CrearOrdenLimitViewController: UIViewController {
     }
     
     func compraChauchas(monto : Double, valorChaucha : Int){
-        let montoInt : Int = Int(monto * Double(truncating: pow(10, self.mainCurrencyUnits) as NSNumber))
-        let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: false){ _id __typename }}"]
+        let montoInt : Int = Int(monto * Double(truncating : pow(10, self.mainCurrencyUnits) as NSNumber))
+        let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: false){ _id }}"]
         
         let request = getRequest(body: body)
         
@@ -271,6 +281,9 @@ class CrearOrdenLimitViewController: UIViewController {
                         if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
                             if let _id = placeLimitOrder["_id"] as? String{
                                 errorOrden = false
+                                
+                                Analytics.logEvent("compra", parameters: ["marketCode":self.mercado, "amount":monto, "limitPrice": valorChaucha])
+                                
                                 let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
                                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                                 self.present(alert, animated: true, completion: nil)
@@ -293,7 +306,7 @@ class CrearOrdenLimitViewController: UIViewController {
         task.resume()
     }
     func vendeChauchas(monto : Double, valorChaucha : Int){
-        let montoInt : Int = Int(monto * Double(truncating: pow(10, self.mainCurrencyUnits) as NSNumber))
+        let montoInt : Int = Int(monto * Double(truncating : pow(10, self.mainCurrencyUnits) as NSNumber))
         let body = ["query": "mutation{ placeLimitOrder(marketCode:\"\(mercado)\", amount : \(montoInt), limitPrice: \(valorChaucha), sell: true){ _id __typename }}"]
         
         let request = getRequest(body: body)
@@ -307,6 +320,7 @@ class CrearOrdenLimitViewController: UIViewController {
                         if let placeLimitOrder = data["placeLimitOrder"] as? [String : Any]{
                             if let _id = placeLimitOrder["_id"] as? String{
                                 errorOrden = false
+                                Analytics.logEvent("venta", parameters: ["marketCode":self.mercado, "amount":monto, "limitPrice": valorChaucha])
                                 let alert = UIAlertController(title: "Orden creada", message: "Orden creada correctamente con ID \(_id)", preferredStyle: UIAlertControllerStyle.alert)
                                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                                 self.present(alert, animated: true, completion: nil)
@@ -315,6 +329,8 @@ class CrearOrdenLimitViewController: UIViewController {
                     }
                 }
             }
+            
+            
             DispatchQueue.main.async {
                 if(errorOrden){
                     let alert = UIAlertController(title: "Error", message: "Error en la creación de la orden, intente nuevamente", preferredStyle: UIAlertControllerStyle.alert)
@@ -325,6 +341,23 @@ class CrearOrdenLimitViewController: UIViewController {
         }
         
         task.resume()
+    }
+    
+    @IBOutlet weak var height: NSLayoutConstraint!
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        self.bannerView.alpha = 0.0
+        self.height.constant = 50
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 1
+        })
+    }
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
+        self.height.constant = 0
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 0.0
+        })
     }
     
 }

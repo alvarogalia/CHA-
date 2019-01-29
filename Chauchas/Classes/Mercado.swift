@@ -15,4 +15,5 @@ class Mercado{
     var variation = 0.0
     var symbol = ""
     var units = 0
+    var releaseDate = 0
 }

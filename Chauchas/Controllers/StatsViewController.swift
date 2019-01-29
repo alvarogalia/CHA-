@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
-class StatsViewController: UIViewController {
+class StatsViewController: UIViewController, GADBannerViewDelegate {
 
     @IBOutlet weak var tableViewOrderBook: UITableView!
     @IBOutlet weak var tableViewVentas: UITableView!
-    
+    @IBOutlet weak var viewBanner: UIView!
+    var bannerView: GADBannerView!
     var mercado = ""
     
     var tableViewClassVentas = OrderBookTableViewController()
@@ -33,6 +35,12 @@ class StatsViewController: UIViewController {
         tableViewOrderBook.dataSource = tableViewClassOrderBook
         tableViewOrderBook.delegate = tableViewClassOrderBook
         
+        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-6479995755181265/8936774992"
+        bannerView.rootViewController = self
+        viewBanner.addBannerViewToView(bannerView: bannerView)
+        bannerView.load(GADRequest())
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -134,5 +142,21 @@ class StatsViewController: UIViewController {
         task.resume()
     }
 
+    @IBOutlet weak var height: NSLayoutConstraint!
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        self.bannerView.alpha = 0.0
+        self.height.constant = 50
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 1
+        })
+    }
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
+        self.height.constant = 0
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.bannerView.alpha = 0.0
+        })
+    }
     
 }
